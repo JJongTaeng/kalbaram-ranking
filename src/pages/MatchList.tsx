@@ -1,18 +1,20 @@
 import React, { useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
-import { getSummonerRequest } from "./api/summoner";
-import { useRecoilState } from "recoil";
-import { summonerAtom } from "./store/summoner";
-import { getMatchDetailRequest, getMatchListRequest } from "./api/match";
-import { matchDetailListAtom, matchListAtom } from "./store/match";
+import { getSummonerRequest } from "../api/summoner";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { summonerAtom } from "../store/summoner";
+import { getMatchDetailRequest, getMatchListRequest } from "../api/match";
+import { matchDetailListAtom, matchListAtom } from "../store/match";
 import styled from "@emotion/styled";
+import { configAtom } from "../store/config";
 
 const MatchList = () => {
   const { summonerName } = useParams();
   const [summoner, setSummoner] = useRecoilState(summonerAtom);
   const [matchList, setMatchList] = useRecoilState(matchListAtom);
   const [matchDetailMap, setMatchDetailMap] = useRecoilState(matchDetailListAtom);
+  const config = useRecoilValue(configAtom);
 
   const matchListMutation = useMutation('fetch/matchList', (puuid: string) => getMatchListRequest(puuid), {
     onSuccess: res => {
@@ -47,7 +49,7 @@ const MatchList = () => {
           summonerName: participant.summonerName,
           win: participant.win,
           championName: participant.championName,
-          totalAmount: Math.floor(participant.totalDamageDealtToChampions + (participant.totalDamageTaken + participant.totalHeal) * 0.2)
+          totalAmount: Math.floor(participant.totalDamageDealtToChampions + (participant.totalDamageTaken * config.takenDamageScale) + (participant.totalHeal * config.healScale) )
         }))
         .filter((matchDetail: any) => matchDetail.teamId === teamId);
 

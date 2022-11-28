@@ -1,61 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { Route, Routes, useNavigate } from "react-router-dom";
-import MatchList from "./MatchList";
+import { Route, Routes } from "react-router-dom";
+import MatchList from "./pages/MatchList";
+import Header from "./Header";
 import styled from "@emotion/styled";
+import Setting from "./components/Setting";
+import ConfigModal from "./components/ConfigModal";
 
 function App() {
-  const navigate = useNavigate();
+  const [visible, setVisible] = useState(false);
+
+
 
   return (
     <div className="App">
-      <Header>
-        <h1>칼바람 나락 기여도 랭킹</h1>
-        <SearchForm onSubmit={(e) => {
-          e.preventDefault();
-          const target = e.target as typeof e.target & {
-            name: { value: string };
-          };
-          if(!target.name.value) return;
-          navigate(target.name.value);
-        }}>
-          <SearchInput placeholder='소환사 이름 입력' type='text' name={'name'}/>
-          <SearchButton type={'submit'}>검색</SearchButton>
-        </SearchForm>
-      </Header>
+      <Header/>
       <Routes>
         <Route path='/:summonerName' element={<MatchList/>}/>
       </Routes>
+      <FixedContainer onClick={() => setVisible(true)}>
+        <Setting width={'2em'} height={'2em'} />
+      </FixedContainer>
+      <ConfigModal visible={visible} onClose={() => setVisible(false)} />
     </div>
   );
 }
 
-const Header = styled.header`
+const FixedContainer = styled.div`
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  right: 20px;
+  bottom: 20px;
+  cursor: pointer;
+  
+  
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-`
-
-const SearchForm = styled.form`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-`
-
-const SearchInput = styled.input`
-  height: 40px;
-  width: 50%;
-  font-size: 1.4rem;
-`
-
-const SearchButton = styled.button`
-  width: 100px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  background-color: dodgerblue;
-  cursor: pointer;
+  
+  background-color: white;
+  transition: 0.3s;
+  svg, path {
+    fill: dodgerblue;
+  }
+  &:hover {
+    background-color: dodgerblue;
+    svg, path {
+      fill: white;
+    }
+  }
 `
 
 export default App;

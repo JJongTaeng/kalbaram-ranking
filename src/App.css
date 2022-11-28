@@ -1,4 +1,8 @@
 .App {
     min-height: 100vh;
+    min-width: 800px;
     box-sizing: border-box;
+    max-width: 1200px;
+
+    margin: auto;
 }
