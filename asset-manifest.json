@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "./static/css/main.36ae45e1.css",
-    "main.js": "./static/js/main.e633dd57.js",
-    "static/js/787.f341ffcf.chunk.js": "./static/js/787.f341ffcf.chunk.js",
-    "index.html": "./index.html",
-    "main.36ae45e1.css.map": "./static/css/main.36ae45e1.css.map",
-    "main.e633dd57.js.map": "./static/js/main.e633dd57.js.map",
-    "787.f341ffcf.chunk.js.map": "./static/js/787.f341ffcf.chunk.js.map"
+    "main.css": "/kalbaram-ranking/static/css/main.36ae45e1.css",
+    "main.js": "/kalbaram-ranking/static/js/main.8f9c117d.js",
+    "static/js/787.f341ffcf.chunk.js": "/kalbaram-ranking/static/js/787.f341ffcf.chunk.js",
+    "index.html": "/kalbaram-ranking/index.html",
+    "main.36ae45e1.css.map": "/kalbaram-ranking/static/css/main.36ae45e1.css.map",
+    "main.8f9c117d.js.map": "/kalbaram-ranking/static/js/main.8f9c117d.js.map",
+    "787.f341ffcf.chunk.js.map": "/kalbaram-ranking/static/js/787.f341ffcf.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.36ae45e1.css",
-    "static/js/main.e633dd57.js"
+    "static/js/main.8f9c117d.js"
   ]
 }
