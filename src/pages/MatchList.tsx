@@ -8,6 +8,7 @@ import { getMatchDetailRequest, getMatchListRequest } from "../api/match";
 import { matchDetailListAtom, matchListAtom } from "../store/match";
 import styled from "@emotion/styled";
 import { configAtom } from "../store/config";
+import LoaderComponent from "../components/LoaderComponent";
 
 const MatchList = () => {
   const { summonerName } = useParams();
@@ -60,7 +61,7 @@ const MatchList = () => {
     })
   }, [matchList])
 
-  return (
+  return matchDetailMutation.isLoading ? <LoaderComponent size={100} color={'dodgerblue'} /> : (
     <Container>
       {
         matchList?.map((matchId) => <>

@@ -16,7 +16,7 @@ function App() {
     <div className="App">
       <Header/>
       <Routes>
-        <Route path='/:summonerName' element={<MatchList/>}/>
+        <Route path='/:summonerName' element={<MatchList />}/>
       </Routes>
       <FixedContainer onClick={() => setVisible(true)}>
         <Setting width={'2em'} height={'2em'} />
