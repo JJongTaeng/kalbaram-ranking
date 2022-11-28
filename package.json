@@ -28,7 +28,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "svgs": "npx @svgr/cli --icon --typescript --out-dir ./src/components ./src/svgs/*"
+    "svgs": "npx @svgr/cli --icon --typescript --out-dir ./src/components ./src/svgs/*",
+    "deploy": "rimraf ./node_modules/.cache/gh-pages && gh-pages --branch gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -48,5 +49,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3000"
+  "devDependencies": {
+    "gh-pages": "^4.0.0",
+    "rimraf": "^3.0.2"
+  }
 }

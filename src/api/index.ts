@@ -7,4 +7,6 @@ export enum API_PATH {
   SET_API_KEY = '/api/riot/api-key',
 }
 
-export const api = axios.create({});
+export const api = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL
+});
