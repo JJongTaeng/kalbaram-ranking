@@ -1,15 +1,12 @@
 {
   "files": {
-    "main.css": "/kalbaram-ranking/static/css/main.36ae45e1.css",
-    "main.js": "/kalbaram-ranking/static/js/main.17401cc2.js",
-    "static/js/787.f341ffcf.chunk.js": "/kalbaram-ranking/static/js/787.f341ffcf.chunk.js",
-    "index.html": "/kalbaram-ranking/index.html",
-    "main.36ae45e1.css.map": "/kalbaram-ranking/static/css/main.36ae45e1.css.map",
-    "main.17401cc2.js.map": "/kalbaram-ranking/static/js/main.17401cc2.js.map",
-    "787.f341ffcf.chunk.js.map": "/kalbaram-ranking/static/js/787.f341ffcf.chunk.js.map"
+    "main.css": "/kalbaram-ranking/static/css/main.c8cf8d96.css",
+    "main.js": "/kalbaram-ranking/static/js/main.de269f2a.js",
+    "static/js/27.76236b6a.chunk.js": "/kalbaram-ranking/static/js/27.76236b6a.chunk.js",
+    "index.html": "/kalbaram-ranking/index.html"
   },
   "entrypoints": [
-    "static/css/main.36ae45e1.css",
-    "static/js/main.17401cc2.js"
+    "static/css/main.c8cf8d96.css",
+    "static/js/main.de269f2a.js"
   ]
 }
