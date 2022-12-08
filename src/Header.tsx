@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import styled from "@emotion/styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ApiKeyModal from "./components/ApiKeyModal";
 
-const Header = () => {
+interface HeaderProps  {
+  setSearchParams: any;
+}
+
+const Header = ({ setSearchParams }: HeaderProps) => {
   const [visible, setVisible] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <HeaderContainer>
@@ -20,7 +23,7 @@ const Header = () => {
           setVisible(true);
           return;
         }
-        navigate(target.name.value);
+        setSearchParams({ summonerName: target.name.value });
       }}>
         <SearchInput placeholder='소환사 이름 입력' type='text' name={'name'}/>
         <SearchButton type={'submit'}>검색</SearchButton>

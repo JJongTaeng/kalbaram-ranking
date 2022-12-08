@@ -21,4 +21,4 @@ export const summonerAtom = atom<SummonerInfo>({
     revisionDate: 0,
     summonerLevel: 0,
   }
-})
+});

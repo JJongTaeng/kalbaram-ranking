@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import { getSummonerRequest } from "../api/summoner";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -8,14 +7,17 @@ import { getMatchDetailRequest, getMatchListRequest } from "../api/match";
 import { matchDetailListAtom, matchListAtom } from "../store/match";
 import styled from "@emotion/styled";
 import { configAtom } from "../store/config";
-import LoaderComponent from "../components/LoaderComponent";
+import { PacmanLoader } from "react-spinners";
+import { randomUUID } from "crypto";
+import { nanoid } from 'nanoid';
 
-const MatchList = () => {
-  const { summonerName } = useParams();
+const MatchList = ({ summonerName }: { summonerName: string }) => {
   const [summoner, setSummoner] = useRecoilState(summonerAtom);
   const [matchList, setMatchList] = useRecoilState(matchListAtom);
   const [matchDetailMap, setMatchDetailMap] = useRecoilState(matchDetailListAtom);
   const config = useRecoilValue(configAtom);
+
+  console.log(summonerName);
 
   const matchListMutation = useMutation('fetch/matchList', (puuid: string) => getMatchListRequest(puuid), {
     onSuccess: res => {
@@ -25,7 +27,7 @@ const MatchList = () => {
 
   const matchDetailMutation = useMutation('fetch/matchDetail', (matchId: string) => getMatchDetailRequest(matchId));
 
-  useQuery('fetch/summoner', async () => await getSummonerRequest(summonerName || ''), {
+  const summonerQuery = useQuery('fetch/summoner', async () => await getSummonerRequest(summonerName || ''), {
     onSuccess: (res: any) => {
       setSummoner(res.data);
     }
@@ -38,39 +40,52 @@ const MatchList = () => {
   }, [summoner.puuid]);
 
   useEffect(() => {
+    summonerQuery.refetch();
+  }, [summonerName])
+
+  useEffect(() => {
     matchList.forEach(async (matchId) => {
       const res = await matchDetailMutation.mutateAsync(matchId);
-      const teamId = res.data.info.participants.find((participant: any) => participant.summonerName === summonerName).teamId;
-      const matchDetail = res.data.info.participants
-        .map((participant: any) => ({
-          totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
-          totalDamageTaken: participant.totalDamageTaken,
-          totalHeal: participant.totalHeal,
-          teamId: participant.teamId,
-          summonerName: participant.summonerName,
-          win: participant.win,
-          championName: participant.championName,
-          totalAmount: Math.floor(participant.totalDamageDealtToChampions + (participant.totalDamageTaken * config.takenDamageScale) + (participant.totalHeal * config.healScale) )
-        }))
-        .filter((matchDetail: any) => matchDetail.teamId === teamId);
+      const teamId = res.data.info.participants.find((participant: any) => participant.summonerName === summonerName)?.teamId;
+      if(teamId) {
+        const matchDetail = res.data.info.participants
+          .map((participant: any) => ({
+            totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+            totalDamageTaken: participant.totalDamageTaken,
+            totalHeal: participant.totalHeal,
+            teamId: participant.teamId,
+            summonerName: participant.summonerName,
+            win: participant.win,
+            championName: participant.championName,
+            totalAmount: Math.floor(participant.totalDamageDealtToChampions + (participant.totalDamageTaken * config.takenDamageScale) + (participant.totalHeal * config.healScale))
+          }))
+          .filter((matchDetail: any) => matchDetail.teamId === teamId);
 
-      setMatchDetailMap((prev) => ({
-        ...prev,
-        [matchId]: matchDetail.sort((a: any, b: any) => b.totalAmount - a.totalAmount),
-      }))
+        setMatchDetailMap((prev) => ({
+          ...prev,
+          [matchId]: matchDetail.sort((a: any, b: any) => b.totalAmount - a.totalAmount),
+        }))
+      }
     })
   }, [matchList])
 
-  return matchDetailMutation.isLoading ? <LoaderComponent size={100} color={'dodgerblue'} /> : (
+  if(!summonerName) return (
+    <Center>
+      소환사 이름을 검색해주세요.
+    </Center>
+  )
+
+  return matchListMutation.isLoading || matchDetailMutation.isLoading ? <Center><PacmanLoader size={25}/></Center> : (
     <Container>
       {
         matchList?.map((matchId) => <>
-          <GameContainer key={matchId}>
+          <GameContainer key={nanoid()}>
             {
               matchDetailMap[matchId]?.map((matchDetail, index) => {
                 return (
-                  <SummonerCard key={index}>
-                    <Img src={`https://opgg-static.akamaized.net/meta/images/lol/champion/${matchDetail.championName}.png`} />
+                  <SummonerCard key={nanoid()}>
+                    <Img
+                      src={`https://opgg-static.akamaized.net/meta/images/lol/champion/${matchDetail.championName}.png`}/>
                     <SummonerName>
                       {matchDetail?.summonerName}
                     </SummonerName>
@@ -90,6 +105,12 @@ const MatchList = () => {
     </Container>
   );
 };
+
+const Center = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
 
 const Container = styled.div`
   box-sizing: border-box;
