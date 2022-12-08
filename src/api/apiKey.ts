@@ -1,8 +1,7 @@
-import axios from "axios";
-import { API_PATH } from "./index";
+import { api, API_PATH } from "./index";
 
 export const setApiKeyRequest = (apiKey: string) => {
-  return axios.post(API_PATH.SET_API_KEY, {
+  return api.post(API_PATH.SET_API_KEY, {
     apiKey,
   })
 }
