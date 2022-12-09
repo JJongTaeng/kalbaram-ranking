@@ -17,8 +17,6 @@ const MatchList = ({ summonerName }: { summonerName: string }) => {
   const [matchDetailMap, setMatchDetailMap] = useRecoilState(matchDetailListAtom);
   const config = useRecoilValue(configAtom);
 
-  console.log(summonerName);
-
   const matchListMutation = useMutation('fetch/matchList', (puuid: string) => getMatchListRequest(puuid), {
     onSuccess: res => {
       setMatchList(res.data);
@@ -27,17 +25,17 @@ const MatchList = ({ summonerName }: { summonerName: string }) => {
 
   const matchDetailMutation = useMutation('fetch/matchDetail', (matchId: string) => getMatchDetailRequest(matchId));
 
-  const summonerQuery = useQuery('fetch/summoner', async () => await getSummonerRequest(summonerName || ''), {
+  const summonerQuery = useQuery('fetch/summoner', async () => summonerName && await getSummonerRequest(summonerName), {
     onSuccess: (res: any) => {
       setSummoner(res.data);
     }
   });
 
   useEffect(() => {
-    if(summoner.puuid) {
+    if(summoner?.puuid) {
       matchListMutation.mutateAsync(summoner.puuid);
     }
-  }, [summoner.puuid]);
+  }, [summoner?.puuid]);
 
   useEffect(() => {
     summonerQuery.refetch();
