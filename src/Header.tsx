@@ -3,12 +3,10 @@ import styled from "@emotion/styled";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ApiKeyModal from "./components/ApiKeyModal";
 
-interface HeaderProps  {
-  setSearchParams: any;
-}
-
-const Header = ({ setSearchParams }: HeaderProps) => {
+const Header = () => {
   const [visible, setVisible] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const summonerName = searchParams.get('summonerName');
 
   return (
     <HeaderContainer>
@@ -23,9 +21,12 @@ const Header = ({ setSearchParams }: HeaderProps) => {
           setVisible(true);
           return;
         }
+        if(summonerName === target.name.value) {
+          window.location.reload()
+        } 
         setSearchParams({ summonerName: target.name.value });
       }}>
-        <SearchInput placeholder='소환사 이름 입력' type='text' name={'name'}/>
+        <SearchInput defaultValue={summonerName || ''} placeholder='소환사 이름 입력' type='text' name={'name'}/>
         <SearchButton type={'submit'}>검색</SearchButton>
       </SearchForm>
       <ApiKeyModal visible={visible} onClose={() => setVisible(false)} />

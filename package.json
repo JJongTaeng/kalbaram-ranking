@@ -55,5 +55,6 @@
     "gh-pages": "^4.0.0",
     "rimraf": "^3.0.2"
   },
-  "homepage": "https://jjongtaeng.github.io/kalbaram-ranking"
+  "homepage": "https://jjongtaeng.github.io/kalbaram-ranking",
+  "proxy": "https://jjongtaeng.com"
 }

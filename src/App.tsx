@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header setSearchParams={setSearchParams}/>
+      <Header />
       <Routes>
         <Route path={`/`} element={<MatchList summonerName={summonerName || ''}/>}/>
       </Routes>

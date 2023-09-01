@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery } from "react-query";
 import { getSummonerRequest } from "../api/summoner";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -8,7 +8,6 @@ import { matchDetailListAtom, matchListAtom } from "../store/match";
 import styled from "@emotion/styled";
 import { configAtom } from "../store/config";
 import { PacmanLoader } from "react-spinners";
-import { randomUUID } from "crypto";
 import { nanoid } from 'nanoid';
 
 const MatchList = ({ summonerName }: { summonerName: string }) => {
@@ -42,30 +41,38 @@ const MatchList = ({ summonerName }: { summonerName: string }) => {
   }, [summonerName])
 
   useEffect(() => {
-    matchList.forEach(async (matchId) => {
+    matchList.forEach(async (matchId, index) => {
       const res = await matchDetailMutation.mutateAsync(matchId);
-      const teamId = res.data.info.participants.find((participant: any) => participant.summonerName === summonerName)?.teamId;
-      if(teamId) {
-        const matchDetail = res.data.info.participants
-          .map((participant: any) => ({
-            totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
-            totalDamageTaken: participant.totalDamageTaken,
-            totalHeal: participant.totalHeal,
-            teamId: participant.teamId,
-            summonerName: participant.summonerName,
-            win: participant.win,
-            championName: participant.championName,
-            totalAmount: Math.floor(participant.totalDamageDealtToChampions + (participant.totalDamageTaken * config.takenDamageScale) + (participant.totalHeal * config.healScale))
+      if(res.data.info.gameMode === 'ARAM') {
+        const teamId = res.data.info.participants.find((participant: any) => participant.summonerName === summonerName)?.teamId;
+        if(teamId) {
+          const matchDetail = res.data.info.participants
+            .map((participant: any) => {
+              const isHealer = participant.championName.match(/soraka|sona|janna/i)
+              const tank = (participant.totalDamageTaken + participant.damageSelfMitigated) * config.takenDamageScale;
+              const dealed = participant.totalDamageDealtToChampions;
+              const healed = isHealer ? participant.totalHeal : 0
+              return ({
+                totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+                totalDamageTaken: participant.totalDamageTaken,
+                totalHeal: participant.totalHeal,
+                teamId: participant.teamId,
+                summonerName: participant.summonerName,
+                win: participant.win,
+                championName: participant.championName,
+                totalAmount: Math.floor(tank + dealed + healed)
+              })
+            })
+            .filter((matchDetail: any) => matchDetail.teamId === teamId);
+  
+          setMatchDetailMap((prev) => ({
+            ...prev,
+            [matchId]: matchDetail.sort((a: any, b: any) => b.totalAmount - a.totalAmount),
           }))
-          .filter((matchDetail: any) => matchDetail.teamId === teamId);
-
-        setMatchDetailMap((prev) => ({
-          ...prev,
-          [matchId]: matchDetail.sort((a: any, b: any) => b.totalAmount - a.totalAmount),
-        }))
+        }
       }
     })
-  }, [matchList])
+  }, [matchList, config])
 
   if(!summonerName) return (
     <Center>
@@ -76,7 +83,7 @@ const MatchList = ({ summonerName }: { summonerName: string }) => {
   return matchListMutation.isLoading || matchDetailMutation.isLoading ? <Center><PacmanLoader size={25}/></Center> : (
     <Container>
       {
-        matchList?.map((matchId) => <>
+        matchList?.map((matchId) => matchDetailMap[matchId]&& <>
           <GameContainer key={nanoid()}>
             {
               matchDetailMap[matchId]?.map((matchDetail, index) => {

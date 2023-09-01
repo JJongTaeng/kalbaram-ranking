@@ -50,7 +50,6 @@ const ConfigModal = ({ visible, onClose }: ConfigModalProps) => {
           <Input defaultValue={config.takenDamageScale} required id='takenDamageScale' name={'apiKey'}/>
         </FormItem>
 
-
       </ModalBody>
     </Modal>
   );
