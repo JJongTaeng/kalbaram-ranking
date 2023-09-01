@@ -30,6 +30,7 @@
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "predeploy": "npm run build",
     "svgs": "npx @svgr/cli --icon --typescript --out-dir ./src/components ./src/svgs/*",
     "deploy": "rimraf ./node_modules/.cache/gh-pages && gh-pages --branch gh-pages -d build"
   },
