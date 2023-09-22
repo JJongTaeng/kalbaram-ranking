@@ -49,7 +49,7 @@ const MatchList = ({ summonerName }: { summonerName: string }) => {
           const matchDetail = res.data.info.participants
             .map((participant: any) => {
               const isHealer = participant.championName.match(/soraka|sona|janna/i)
-              const tank = (participant.totalDamageTaken + participant.damageSelfMitigated) * config.takenDamageScale;
+              const tank = (participant.totalDamageTaken * config.takenDamageScale) + (participant.damageSelfMitigated * 0.1);
               const dealed = participant.totalDamageDealtToChampions;
               const healed = isHealer ? participant.totalHeal : 0
               return ({
