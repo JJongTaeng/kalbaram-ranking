@@ -1,112 +1,79 @@
-import React, { useEffect, useState } from 'react';
-import { useMutation, useQuery } from "react-query";
-import { getSummonerRequest } from "../api/summoner";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { summonerAtom } from "../store/summoner";
-import { getMatchDetailRequest, getMatchListRequest } from "../api/match";
-import { matchDetailListAtom, matchListAtom } from "../store/match";
-import styled from "@emotion/styled";
-import { configAtom } from "../store/config";
-import { PacmanLoader } from "react-spinners";
+import React from 'react';
+import styled from '@emotion/styled';
 import { nanoid } from 'nanoid';
+import { MatchDetail } from '../store/match';
+import { PacmanLoader } from 'react-spinners';
 
-const MatchList = ({ summonerName }: { summonerName: string }) => {
-  const [summoner, setSummoner] = useRecoilState(summonerAtom);
-  const [matchList, setMatchList] = useRecoilState(matchListAtom);
-  const [matchDetailMap, setMatchDetailMap] = useRecoilState(matchDetailListAtom);
-  const config = useRecoilValue(configAtom);
+const MatchList = ({
+  gameName,
+  tagLine,
+  refetch,
+  error,
+  matchDetailList,
+  loading,
+}: {
+  gameName: string;
+  tagLine: string;
+  refetch: () => void;
+  matchDetailList?: MatchDetail[][];
+  error: any;
+  loading: boolean;
+}) => {
+  const calcScore = (participant: MatchDetail) => {
+    return (
+      participant?.totalDamageDealtToChampions +
+      participant.totalDamageTaken * 0.2 +
+      participant.totalHeal * 0.1
+    );
+  };
 
-  const matchListMutation = useMutation('fetch/matchList', (puuid: string) => getMatchListRequest(puuid), {
-    onSuccess: res => {
-      setMatchList(res.data);
-    }
-  });
-
-  const matchDetailMutation = useMutation('fetch/matchDetail', (matchId: string) => getMatchDetailRequest(matchId));
-
-  const summonerQuery = useQuery('fetch/summoner', async () => summonerName && await getSummonerRequest(summonerName), {
-    onSuccess: (res: any) => {
-      setSummoner(res.data);
-    }
-  });
-
-  useEffect(() => {
-    if(summoner?.puuid) {
-      matchListMutation.mutateAsync(summoner.puuid);
-    }
-  }, [summoner?.puuid]);
-
-  useEffect(() => {
-    summonerQuery.refetch();
-  }, [summonerName])
-
-  useEffect(() => {
-    matchList.forEach(async (matchId, index) => {
-      const res = await matchDetailMutation.mutateAsync(matchId);
-      if(res.data.info.gameMode === 'ARAM') {
-        const teamId = res.data.info.participants.find((participant: any) => participant.summonerName === summonerName)?.teamId;
-        if(teamId) {
-          const matchDetail = res.data.info.participants
-            .map((participant: any) => {
-              const isHealer = participant.championName.match(/soraka|sona|janna/i)
-              const tank = (participant.totalDamageTaken * config.takenDamageScale) + (participant.damageSelfMitigated * 0.1);
-              const dealed = participant.totalDamageDealtToChampions;
-              const healed = isHealer ? participant.totalHeal : 0
-              return ({
-                totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
-                totalDamageTaken: participant.totalDamageTaken,
-                totalHeal: participant.totalHeal,
-                teamId: participant.teamId,
-                summonerName: participant.summonerName,
-                win: participant.win,
-                championName: participant.championName,
-                totalAmount: Math.floor(tank + dealed + healed)
-              })
-            })
-            .filter((matchDetail: any) => matchDetail.teamId === teamId);
-  
-          setMatchDetailMap((prev) => ({
-            ...prev,
-            [matchId]: matchDetail.sort((a: any, b: any) => b.totalAmount - a.totalAmount),
-          }))
-        }
-      }
-    })
-  }, [matchList, config])
-
-  if(!summonerName) return (
-    <Center>
-      소환사 이름을 검색해주세요.
-    </Center>
-  )
-
-  return matchListMutation.isLoading || matchDetailMutation.isLoading ? <Center><PacmanLoader size={25}/></Center> : (
+  return (
     <Container>
-      {
-        matchList?.map((matchId) => matchDetailMap[matchId]&& <>
-          <GameContainer key={nanoid()}>
-            {
-              matchDetailMap[matchId]?.map((matchDetail, index) => {
-                return (
-                  <SummonerCard key={nanoid()}>
-                    <Img
-                      src={`https://opgg-static.akamaized.net/meta/images/lol/champion/${matchDetail.championName}.png`}/>
-                    <SummonerName>
-                      {matchDetail?.summonerName}
-                    </SummonerName>
-                    <Ranking>
-                      {index + 1}등
-                    </Ranking>
-                    <TotalAmount>
-                      {matchDetail.totalAmount}
-                    </TotalAmount>
-                  </SummonerCard>
-                );
-              })
-            }
-          </GameContainer>
-        </>)
-      }
+      {loading && (
+        <Center>
+          <PacmanLoader size={25} />
+        </Center>
+      )}
+      {error?.message?.response?.status === 404 && (
+        <Center>소환사를 찾지 못했습니다.</Center>
+      )}
+      {!gameName && <Center>소환사 이름을 입력해주세요.</Center>}
+      {matchDetailList?.map((matchDetail) => {
+        const myTeamId = matchDetail.filter(
+          (participant) =>
+            participant.summoner.gameName.toLowerCase() ===
+            gameName.replaceAll(' ', '').toLowerCase(),
+        )?.[0]?.teamId;
+
+        return (
+          <>
+            <GameContainer key={nanoid()}>
+              {matchDetail
+                .filter((participant) => participant.teamId === myTeamId)
+                .sort(
+                  (participant1, participant2) =>
+                    calcScore(participant2) - calcScore(participant1),
+                )
+                .map((participant, index) => {
+                  return (
+                    <SummonerCard key={nanoid()}>
+                      <Img
+                        src={`https://opgg-static.akamaized.net/meta/images/lol/champion/${participant.championName}.png`}
+                      />
+                      <SummonerName>
+                        {participant?.summoner.gameName}
+                      </SummonerName>
+                      <Ranking>{index + 1}등</Ranking>
+                      <TotalAmount>
+                        {calcScore(participant).toFixed()}
+                      </TotalAmount>
+                    </SummonerCard>
+                  );
+                })}
+            </GameContainer>
+          </>
+        );
+      })}
     </Container>
   );
 };
@@ -115,11 +82,11 @@ const Center = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 const Container = styled.div`
   box-sizing: border-box;
-`
+`;
 
 const GameContainer = styled.div`
   display: flex;
@@ -129,31 +96,31 @@ const GameContainer = styled.div`
   padding: 16px 32px;
   justify-content: center;
   margin: 1rem;
-`
+`;
 
 const SummonerCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0 16px;
-`
+`;
 
 const SummonerName = styled.div`
   font-size: 1.2rem;
   padding: 4px 0;
-`
+`;
 
 const Ranking = styled.div`
   color: dodgerblue;
   padding: 4px 0;
-`
+`;
 
 const TotalAmount = styled.div`
   color: crimson;
-`
+`;
 
 const Img = styled.img`
   border-radius: 50%;
-`
+`;
 
 export default MatchList;

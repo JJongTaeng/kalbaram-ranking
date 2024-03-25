@@ -1,12 +1,14 @@
-import axios from "axios";
+import axios from 'axios';
 
 export enum API_PATH {
-  GET_SUMMONER= '/api/riot/summoner',
-  GET_MATCH_LIST = '/api/riot/match-list',
-  GET_MATCH_DETAIL = '/api/riot/match-detail',
-  SET_API_KEY = '/api/riot/api-key',
+  SEARCH_SUMMONER = '/api/swordwind/summoner/search',
+  UPDATE_SUMMONER = '/api/swordwind/summoner/update',
+  SET_API_KEY = '/api/swordwind/api-key',
 }
 
 export const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL
+  headers: {
+    'Cache-Control': 'no-cache',
+  },
+  baseURL: process.env.REACT_APP_API_BASE_URL,
 });
