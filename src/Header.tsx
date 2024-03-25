@@ -52,7 +52,11 @@ const Header = ({
         }}
       >
         <SearchInput
-          defaultValue={gameNameParam + '#' + tagLineParam || ''}
+          defaultValue={
+            gameNameParam && tagLineParam
+              ? gameNameParam + '#' + tagLineParam
+              : ''
+          }
           placeholder="소환사 이름 입력"
           type="text"
           name={'name'}
