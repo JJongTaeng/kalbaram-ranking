@@ -57,7 +57,7 @@ const Header = ({
               ? gameNameParam + '#' + tagLineParam
               : ''
           }
-          placeholder="소환사 이름 입력"
+          placeholder="소환사 이름 + #tag"
           type="text"
           name={'name'}
         />

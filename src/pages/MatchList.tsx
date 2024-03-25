@@ -35,9 +35,9 @@ const MatchList = ({
         </Center>
       )}
       {error?.message?.response?.status === 404 && (
-        <Center>소환사를 찾지 못했습니다.</Center>
+        <Center>소환사를 찾지 못했습니다. 태그를 함께 입력해주셨나요?</Center>
       )}
-      {!gameName && <Center>소환사 이름을 입력해주세요.</Center>}
+      {!gameName && <Center>소환사 이름과 태그를 입력해주세요.</Center>}
       {matchDetailList?.map((matchDetail) => {
         const myTeamId = matchDetail.filter(
           (participant) =>
