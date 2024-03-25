@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/kalbaram-ranking/static/css/main.c8cf8d96.css",
-    "main.js": "/kalbaram-ranking/static/js/main.bf7a46d3.js",
+    "main.js": "/kalbaram-ranking/static/js/main.091444b3.js",
     "static/js/27.76236b6a.chunk.js": "/kalbaram-ranking/static/js/27.76236b6a.chunk.js",
     "index.html": "/kalbaram-ranking/index.html"
   },
   "entrypoints": [
     "static/css/main.c8cf8d96.css",
-    "static/js/main.bf7a46d3.js"
+    "static/js/main.091444b3.js"
   ]
 }
